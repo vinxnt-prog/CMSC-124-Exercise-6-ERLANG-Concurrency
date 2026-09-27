@@ -1,4 +1,4 @@
--module(pingpong).
+-module(decastrogloria_exer6).
 -compile(export_all).
 
 start_pong() ->
