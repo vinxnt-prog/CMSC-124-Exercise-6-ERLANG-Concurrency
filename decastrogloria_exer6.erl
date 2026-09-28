@@ -2,7 +2,7 @@
 -compile(export_all).
 
 start_pong() ->
-	register (pong, spawn(pingpong,pong,[])).
+	register (pong, spawn(decastrogloria_exer6,pong,[])).
 
 pong() ->
 	receive
@@ -15,7 +15,7 @@ pong() ->
 	end.
 
 start_ping(Pong_Node) ->
-	spawn(pingpong, ping, [3,Pong_Node]).
+	spawn(decastrogloria_exer6, ping, [3,Pong_Node]).
 
 ping(0, Pong_Node) ->
 	{pong, Pong_Node} ! finished,
