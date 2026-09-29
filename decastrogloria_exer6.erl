@@ -1,5 +1,6 @@
 -module(decastrogloria_exer6).
 -compile(export_all).
+-compile(nowarn_export_all).
 
 % host the chat
 init_chat() ->
