@@ -1,10 +1,11 @@
 -module(decastrogloria_exer6).
 -compile(export_all).
+-compile(nowarn_export_all).
 
 % host the chat
 init_chat() ->
     % get user name and trim newline character
-    _Name = string:trim(io:get_line("Enter Your Name: ")),
+    Name = string:trim(io:get_line("Enter Your Name: ")),
 
     ReceiverPid = spawn(decastrogloria_exer6, chat, []),
     register(chat, ReceiverPid), % start the receiver
@@ -14,11 +15,11 @@ init_chat() ->
 
     chat_server ! {join, ReceiverPid}, % host (this) joins the server
 
-    ok. % para sa input to (another function)
+    send_messages(Name, ReceiverPid). % para sa input to (another function)
 
 % guest of the chat
 init_chat2(FrodoNode) ->
-    _Name = string:trim(io:get_line("Enter Your Name: ")),
+    Name = string:trim(io:get_line("Enter Your Name: ")),
 
     % start the receiver
     ReceiverPid = spawn(decastrogloria_exer6, chat, []),
@@ -27,7 +28,36 @@ init_chat2(FrodoNode) ->
     % guest joins the server
     {chat_server, FrodoNode} ! {join, ReceiverPid},
 
-    ok. % para sa input to (another function)
+    send_messages(Name, ReceiverPid). % para sa input to (another function)
+
+
+% continuously read terminal input 
+% send messages to chat server
+% keep looping
+% terminate on "bye"
+send_messages(Name, ReceiverPid) ->
+    Input = get_input(),
+    if 
+        Input == "bye" ->
+            io:format("You disconnected.");
+        true ->
+            io:format("~s: ~s~n", [Name, Input]),
+            send_messages(Name, ReceiverPid)
+    end.
+
+% helper function for send_messages()
+% this helper function reads the terminal input
+get_input() ->
+    % Prompt the user and read a line of text
+    case io:get_line("input> ") of
+        {error, Reason} -> 
+            io:format("Error reading input: ~s~n", [Reason]),
+            error;
+        Data ->
+            % Clean up the trailing newline character (\n)
+            CleanData = string:trim(Data),
+            CleanData
+    end.
 
 % receiver loop
 chat() ->

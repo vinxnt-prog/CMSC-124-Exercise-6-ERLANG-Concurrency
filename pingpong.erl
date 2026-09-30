@@ -1,5 +1,6 @@
 -module(pingpong).
 -compile(export_all).
+-compile(nowarn_export_all). %% Suppresses the export_all warning
 
 start_pong() ->
 	register (pong, spawn(pingpong,pong,[])).
