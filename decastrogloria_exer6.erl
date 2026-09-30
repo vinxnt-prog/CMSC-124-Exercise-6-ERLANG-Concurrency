@@ -15,7 +15,7 @@ init_chat() ->
 
     chat_server ! {join, ReceiverPid}, % host (this) joins the server
 
-    send_messages(Name, ReceiverPid). % para sa input to (another function)
+    send_messages(Name, ReceiverPid, node()). % para sa input to (another function)
 
 % guest of the chat
 init_chat2(FrodoNode) ->
@@ -28,21 +28,21 @@ init_chat2(FrodoNode) ->
     % guest joins the server
     {chat_server, FrodoNode} ! {join, ReceiverPid},
 
-    send_messages(Name, ReceiverPid). % para sa input to (another function)
+    send_messages(Name, ReceiverPid, FrodoNode). % para sa input to (another function)
 
 
 % continuously read terminal input 
 % send messages to chat server
 % keep looping
 % terminate on "bye"
-send_messages(Name, ReceiverPid) ->
-    Input = get_input(),
+send_messages(Name, ReceiverPid, FrodoNode) ->
+    Message = get_input(),
     if 
-        Input == "bye" ->
+        Message == "bye" ->
             io:format("You disconnected.");
         true ->
-            io:format("~s: ~s~n", [Name, Input]),
-            send_messages(Name, ReceiverPid)
+            {chat_server, FrodoNode} ! {chat_msg, Name, Message, ReceiverPid},
+            send_messages(Name, ReceiverPid, FrodoNode)
     end.
 
 % helper function for send_messages()
@@ -64,7 +64,7 @@ chat() ->
     receive
         {SenderName, Message} ->
             % print the message
-            io:format("~s: ~s", [SenderName, Message]),
+            io:format("~s: ~s~n", [SenderName, Message]),
             chat(); % recursive call
             
         bye ->
