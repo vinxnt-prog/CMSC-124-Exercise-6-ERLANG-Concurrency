@@ -20,8 +20,6 @@ init_chat() ->
     SenderPid = spawn(decastrogloria_exer6, send_messages, [Name, ReceiverPid, node(), ShellPid]),
     wait_for_end(SenderPid). % main terminal will wait until chat ends ('bye' is sent)
 
-    % send_messages(Name, ReceiverPid, node()). % para sa input to (another function)
-
 % guest of the chat
 init_chat2(FrodoNode) ->
     Name = string:trim(io:get_line("Enter Your Name: ")),
@@ -37,9 +35,6 @@ init_chat2(FrodoNode) ->
     % spawn input loop
     SenderPid = spawn(decastrogloria_exer6, send_messages, [Name, ReceiverPid, FrodoNode, ShellPid]),
     wait_for_end(SenderPid). % this terminal will also wiat (like main terminal) until chat ends
-
-    % send_messages(Name, ReceiverPid, FrodoNode). % para sa input to (another function)
-
 
 % continuously read terminal input 
 % send messages to chat server
