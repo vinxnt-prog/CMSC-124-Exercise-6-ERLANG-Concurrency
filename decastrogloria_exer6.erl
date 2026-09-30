@@ -39,7 +39,9 @@ send_messages(Name, ReceiverPid, FrodoNode) ->
     Message = get_input(),
     if 
         Message == "bye" ->
-            io:format("You disconnected.");
+            {chat_server, FrodoNode} ! {chat_msg, Name, Message, ReceiverPid},
+            {chat_server, FrodoNode} ! {bye, ReceiverPid},
+            io:format("You disconnected.~n");
         true ->
             {chat_server, FrodoNode} ! {chat_msg, Name, Message, ReceiverPid},
             send_messages(Name, ReceiverPid, FrodoNode)
@@ -69,7 +71,7 @@ chat() ->
             
         bye ->
             % closing message and terminate
-            io:format("Chat ended.~n");
+            io:format("Your partner disconnected.~n");
             % no chat() recursive call since end of convo na
         
         _ -> % for catching unrecognized messages
@@ -95,6 +97,18 @@ server(Clients) ->
             end, Clients), % this is the list (Client)
             server(Clients); % keep the server listening/running
             
+        {bye, SenderPid} ->
+            lists:foreach(fun(ClientPid) ->
+                if ClientPid /= SenderPid ->
+                    ClientPid ! bye;
+                true ->
+                    ok
+                end
+            end, Clients),
+
+        % remove the client
+        server(lists:delete(SenderPid, Clients));
+
         _ -> % for invalidities
             server(Clients)
     end.
